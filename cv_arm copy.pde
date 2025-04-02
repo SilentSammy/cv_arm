@@ -6,20 +6,17 @@ float F = 50;
 float T = 70;
 float millisOld, gTime, gSpeed = 4;
 
-double[] read_end_eff_pos() {
-  ArrayList<Float> lines = new ArrayList<Float>();
-  String[] fileLines = loadStrings("end_eff.txt");
-  for (String line : fileLines) {
-    lines.add(Float.parseFloat(line.trim()));
-  }
-  // Manually convert the ArrayList<Float> to a double[]
-  double[] result = new double[lines.size()];
-  for (int i = 0; i < lines.size(); i++) {
-    result[i] = lines.get(i);
-  }
-  return result;
+double[] end_eff_image = new double[] {0.38, 0.26};
+double[] normalize(double x, double y) {
+    double normX = x / 0.38;
+    double normY = y / 0.26;
+    return new double[] { normX, normY };
 }
-
+public static double[] denormalize(double x, double y) {
+    double denormX = x * -60;
+    double denormY = y * -40 + 51;
+    return new double[] { denormX, denormY };
+}
 void IK(){
   float X = posX;
   float Y = posY;
@@ -38,13 +35,41 @@ void setTime(){
   millisOld = (float)millis()/1000;
 }
 
+ArrayList<PVector> readNormalizedPoints(String filename) {
+  ArrayList<PVector> points = new ArrayList<PVector>();
+  String[] lines = loadStrings(filename);
+
+  for (String line : lines) {
+    line = line.trim();
+    if (line.startsWith("(") && line.endsWith(")")) {
+      line = line.substring(1, line.length() - 1); // Remove parentheses
+      String[] parts = line.split(",");
+      if (parts.length == 2) {
+        float x = float(trim(parts[0]));
+        float y = float(trim(parts[1]));
+        points.add(new PVector(x, y));
+      }
+    }
+  }
+
+  return points;
+}
+
 void writePos(){
   IK();
   setTime();
-  double[] end_eff_pos = read_end_eff_pos();
+  ArrayList<PVector> points = readNormalizedPoints("coords_normalized.txt");
+  PVector end_eff_image = points.get(0);  // Correct way to get first element
+  PVector base_image = points.get(1);  // Correct way to get second element
 
-  posY = (float)end_eff_pos[1];
-  posZ = (float)end_eff_pos[2];
+  end_eff_image = new PVector(abs(end_eff_image.x - base_image.x), abs(end_eff_image.y - base_image.y));
+  
+
+  double[] norm_end_eff = normalize(end_eff_image.x, end_eff_image.y);
+  double[] denorm_end_eff = denormalize(norm_end_eff[0], norm_end_eff[1]);
+
+  posY = (float)denorm_end_eff[0];
+  posZ = (float)denorm_end_eff[1];
 }
 
 void drawReferenceFrame() {

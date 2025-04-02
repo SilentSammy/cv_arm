@@ -2,9 +2,17 @@ import cv2
 import numpy as np
 import math
 from scipy.spatial import distance
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
+
+# Abrir un cuadro de diálogo para seleccionar la imagen
+Tk().withdraw()  # Ocultar la ventana principal de Tkinter
+image_path = askopenfilename(title="Selecciona una imagen", filetypes=[("Imagenes", "*.png;*.jpg;*.jpeg")])
+if not image_path:
+    raise Exception("No se seleccionó ninguna imagen.")
 
 # Cargar la imagen
-image = cv2.imread("imagen1.png")
+image = cv2.imread(image_path)
 if image is None:
     raise Exception("Error al cargar la imagen. Verifica la ruta y el nombre del archivo.")
 
