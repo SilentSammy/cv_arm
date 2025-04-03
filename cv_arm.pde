@@ -6,18 +6,34 @@ float F = 50;
 float T = 70;
 float millisOld, gTime, gSpeed = 4;
 
-double[] read_end_eff_pos() {
-  ArrayList<Float> lines = new ArrayList<Float>();
+void read_end_eff_pos() {
+  // Attempt to load file lines
   String[] fileLines = loadStrings("end_eff.txt");
+  if (fileLines == null || fileLines.length < 3) {
+    println("Warning: File unreadable or not enough lines (need at least 3).");
+    return;
+  }
+  
+  ArrayList<Float> validFloats = new ArrayList<Float>();
   for (String line : fileLines) {
-    lines.add(Float.parseFloat(line.trim()));
+    try {
+      float value = Float.parseFloat(line.trim());
+      validFloats.add(value);
+    } catch (NumberFormatException e) {
+      println("Warning: Invalid float value encountered: " + line);
+      // Continue to next line
+    }
   }
-  // Manually convert the ArrayList<Float> to a double[]
-  double[] result = new double[lines.size()];
-  for (int i = 0; i < lines.size(); i++) {
-    result[i] = lines.get(i);
+  
+  if (validFloats.size() < 3) {
+    println("Warning: Not enough valid float values found.");
+    return;
   }
-  return result;
+  
+  // Only assign if we have at least 3 valid floats.
+  posX = validFloats.get(0);
+  posY = validFloats.get(1);
+  posZ = validFloats.get(2);
 }
 
 void IK(){
@@ -41,10 +57,7 @@ void setTime(){
 void writePos(){
   IK();
   setTime();
-  double[] end_eff_pos = read_end_eff_pos();
-
-  posY = (float)end_eff_pos[1];
-  posZ = (float)end_eff_pos[2];
+  read_end_eff_pos();
 }
 
 void drawReferenceFrame() {
@@ -64,6 +77,7 @@ float[] Zsphere = new float[1];
 
 void setup(){
     size(1200, 800, OPENGL);
+    surface.setResizable(true);
     
     base = loadShape("r5.obj");
     shoulder = loadShape("r1.obj");
