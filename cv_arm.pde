@@ -114,19 +114,19 @@ void draw(){
     rotateY(-rotY);
     scale(-4);
 
-    drawReferenceFrame();
+    // drawReferenceFrame();
 
     for (int i=0; i < Xsphere.length; i++) {
      pushMatrix();
      translate(-Ysphere[i], -Zsphere[i]-11, -Xsphere[i]);
-     fill (#D003FF, 25);
+     stroke(0, 0, 255);
      sphere (5);
      popMatrix();
     }
 
     fill(#FFE308);  
     translate(0,-40,0);   
-    drawReferenceFrame();
+    // drawReferenceFrame();
     shape(base);
 
     fill(#FFE308);

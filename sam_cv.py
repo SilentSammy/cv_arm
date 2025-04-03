@@ -166,8 +166,8 @@ def estimate_distance_from_quadrilateral(new_corners, image_size, calib_distance
 def get_end_eff(end_eff_norm, base_norm, distance):
     def normalize(point):
         x, y = point
-        norm_x = x / 0.38
-        norm_y = y / 0.26
+        norm_x = x / 0.30
+        norm_y = y / 0.15
         return (norm_x, norm_y)
 
     def denormalize(point):
@@ -217,7 +217,8 @@ def process_image(image, show_image=False):
 
     # Filter dots
     # base_dot = max(red_dots, key=lambda p: p[0] + p[1])
-    base_dot = max(red_dots, key=lambda p: p[1])
+    # base_dot = max(red_dots, key=lambda p: p[1])
+    base_dot = max(red_dots, key=lambda p: 0.5*p[0] + p[1])
     red_dots = get_n_closest_points(green_dot, red_dots, 5)
     red_dots = find_best_quadrilateral(red_dots)
     red_dots = order_corners(red_dots)
